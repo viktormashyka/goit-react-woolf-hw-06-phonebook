@@ -1,4 +1,8 @@
 import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { addContact } from 'store/contactsSlice';
+import { toast } from 'react-toastify';
+import { nanoid } from 'nanoid';
 import css from './ContactForm.module.css';
 
 const INITIAL_STATE = {
@@ -6,25 +10,37 @@ const INITIAL_STATE = {
   number: '',
 };
 
-export const ContactForm = ({ onAddContact }) => {
-  const [contact, setContact] = useState(INITIAL_STATE);
+export const ContactForm = () => {
+  const [newContact, setNewContact] = useState(INITIAL_STATE);
+
+  const contacts = useSelector(state => state.contacts);
+  const dispatch = useDispatch();
 
   const handleChange = evt => {
     const { name, value } = evt.target;
-    setContact(prevContact => ({ ...prevContact, [name]: value }));
+    setNewContact(prevContact => ({ ...prevContact, [name]: value }));
   };
 
   const handleSubmit = evt => {
     evt.preventDefault();
 
-    if (onAddContact) {
-      onAddContact({ ...contact });
+    if (
+      contacts.some(
+        contact =>
+          contact.name.toLocaleLowerCase() ===
+          newContact.name.toLocaleLowerCase()
+      )
+    ) {
+      toast.info(`Contact "${newContact.name}" is already in contacts`);
+      return;
     }
 
-    setContact(INITIAL_STATE);
+    dispatch(addContact({ ...newContact, id: nanoid() }));
+
+    setNewContact(INITIAL_STATE);
   };
 
-  const { name, number } = contact;
+  const { name, number } = newContact;
   return (
     <form className={css.form} onSubmit={handleSubmit}>
       <label className={css.label}>
