@@ -4,6 +4,7 @@ import { addContact } from 'store/contactsSlice';
 import { toast } from 'react-toastify';
 import { nanoid } from 'nanoid';
 import css from './ContactForm.module.css';
+import { getContacts } from 'store/selectors';
 
 const INITIAL_STATE = {
   name: '',
@@ -13,7 +14,7 @@ const INITIAL_STATE = {
 export const ContactForm = () => {
   const [newContact, setNewContact] = useState(INITIAL_STATE);
 
-  const contacts = useSelector(state => state.contacts);
+  const contacts = useSelector(getContacts);
   const dispatch = useDispatch();
 
   const handleChange = evt => {
